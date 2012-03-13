@@ -13,6 +13,11 @@
 @end
 
 @implementation TLViewController
+@synthesize txtEndPointURL;
+@synthesize txtDevKey;
+@synthesize txtTestcaseID;
+@synthesize txtTestplanID;
+@synthesize txtBuildID;
 
 - (void)viewDidLoad
 {
@@ -22,6 +27,11 @@
 
 - (void)viewDidUnload
 {
+    [self setTxtEndPointURL:nil];
+    [self setTxtDevKey:nil];
+    [self setTxtTestcaseID:nil];
+    [self setTxtTestplanID:nil];
+    [self setTxtBuildID:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
@@ -31,4 +41,22 @@
     return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
 }
 
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    [textField resignFirstResponder];
+    return YES;
+}
+- (IBAction)reportAsPassed:(id)sender {
+    NSLog(@"Passed");
+}
+- (IBAction)reportAsFailed:(id)sender {
+    NSLog(@"Failed");
+}
+- (void)dealloc {
+    [txtEndPointURL release];
+    [txtDevKey release];
+    [txtTestcaseID release];
+    [txtTestplanID release];
+    [txtBuildID release];
+    [super dealloc];
+}
 @end

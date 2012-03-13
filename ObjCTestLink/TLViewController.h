@@ -8,6 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-@interface TLViewController : UIViewController
-
+@interface TLViewController : UIViewController <UITextFieldDelegate>
+@property (retain, nonatomic) IBOutlet UITextField *txtEndPointURL;
+@property (retain, nonatomic) IBOutlet UITextField *txtDevKey;
+@property (retain, nonatomic) IBOutlet UITextField *txtTestcaseID;
+@property (retain, nonatomic) IBOutlet UITextField *txtTestplanID;
+@property (retain, nonatomic) IBOutlet UITextField *txtBuildID;
 @end
