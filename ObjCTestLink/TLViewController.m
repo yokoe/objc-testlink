@@ -74,7 +74,7 @@ NSString *const kTLBuildID = @"BuildID";
 #undef AddStringMemberFromInt
     
     NSString* members = [membersArray componentsJoinedByString:@""];
-    return [NSString stringWithFormat:@"<methodCall><methodName>tl.reportTCResult</method><params><param><value><struct>%@</struct></value></param></params></methodCall>", members];
+    return [NSString stringWithFormat:@"<methodCall><methodName>tl.reportTCResult</methodName><params><param><value><struct>%@</struct></value></param></params></methodCall>", members];
 }
 - (void)sendReportAsStatus:(NSString*)status {
     // Save settings
@@ -88,8 +88,26 @@ NSString *const kTLBuildID = @"BuildID";
 #undef SetValueToUserDefaults
     
     // Generate request body
-    NSLog(@"Request Body: %@", [self requestBodyWithDevKey:txtDevKey.text testPlanID:[txtTestplanID.text intValue] testCaseID:[txtTestplanID.text intValue] buildID:[txtBuildID.text intValue] status:status]);
+    NSString* bodyString = [self requestBodyWithDevKey:txtDevKey.text testPlanID:[txtTestplanID.text intValue] testCaseID:[txtTestplanID.text intValue] buildID:[txtBuildID.text intValue] status:status];
+    
+    // Post
+    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:txtEndPointURL.text] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData 
+                                                       timeoutInterval:60.0]; 
+    [request setHTTPMethod:@"POST"];
+    [request setHTTPBody:[bodyString dataUsingEncoding:NSUTF8StringEncoding]];
+    [request setValue:@"text/xml" forHTTPHeaderField:@"Content-type"];
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+        if (!error) {
+            NSLog(@"Response: %@", [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease]);
+        } else {
+            NSLog(@"Connection error: %@", error);
+            if (data) {
+                NSLog(@"Response: %@", [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease]);
+            }
+        }
+    }]; 
 }
+
 - (IBAction)reportAsPassed:(id)sender {
     [self sendReportAsStatus:@"p"];
 }
