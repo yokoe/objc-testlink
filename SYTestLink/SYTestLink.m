@@ -9,6 +9,7 @@
 #import "SYTestLink.h"
 
 @implementation SYTestLink
+@synthesize buildID = buildID_, devKey = devKey_, endPointURL = endPointURL_, testPlanID = testPlanID_;
 + (NSString*)requestBodyWithDevKey:(NSString*)devKey testPlanID:(int)testPlanID testCaseID:(int)testCaseID buildID:(int)buildID status:(NSString*)status {
     NSMutableArray* membersArray = [NSMutableArray array];
 #define AddStringMember(key, value) ([membersArray addObject:[NSString stringWithFormat:@"<member><name>%@</name><value><string>%@</string></value></member>", key, value]])
@@ -35,5 +36,36 @@
             completionHandler(response, data ? [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease] : nil, error);
         }
     }]; 
+}
+
+
+- (id)initWithEndpointURL:(NSString*)endPointURL devKey:(NSString*)devKey testPlanID:(int)testPlanID buildID:(int)buildID {
+    self = [super init];
+    if (self) {
+        self.devKey = devKey;
+        self.endPointURL = endPointURL;
+        self.testPlanID = testPlanID;
+        self.buildID = buildID;
+    }
+    return self;
+}
+
+- (void)dealloc
+{
+    self.devKey = nil;
+    self.endPointURL = nil;
+    [super dealloc];
+}
+
+- (void)sendReportForTestCaseID:(int)testCaseID status:(NSString*)status {
+    NSString* body = [SYTestLink requestBodyWithDevKey:self.devKey testPlanID:self.testPlanID testCaseID:testCaseID buildID:self.buildID status:status];
+    [SYTestLink sendReportToURL:[NSURL URLWithString:self.endPointURL] withBody:body queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSString *responseBody, NSError *error) {
+        if (error) {
+            NSLog(@"Connection error: %@", error);
+            if (responseBody) {
+                NSLog(@"Response: %@", responseBody);
+            }
+        }
+    }];
 }
 @end

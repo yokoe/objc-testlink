@@ -74,19 +74,8 @@ NSString *const kTLBuildID = @"BuildID";
 #undef SetValueToUserDefaults
     
     // Generate request body
-    NSString* bodyString = [SYTestLink requestBodyWithDevKey:txtDevKey.text testPlanID:[txtTestplanID.text intValue] testCaseID:[txtTestcaseID.text intValue] buildID:[txtBuildID.text intValue] status:status];
-    
-    // Post
-    [SYTestLink sendReportToURL:[NSURL URLWithString:txtEndPointURL.text] withBody:bodyString queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSString *responseBody, NSError *error) {
-        if (!error) {
-            NSLog(@"Response: %@", responseBody);
-        } else {
-            NSLog(@"Connection error: %@", error);
-            if (responseBody) {
-                NSLog(@"Response: %@", responseBody);
-            }
-        }
-    }];
+    SYTestLink* tl = [[[SYTestLink alloc] initWithEndpointURL:txtEndPointURL.text devKey:txtDevKey.text testPlanID:[txtTestplanID.text intValue] buildID:[txtBuildID.text intValue]] autorelease];
+    [tl sendReportForTestCaseID:[txtTestcaseID.text intValue] status:status];
 }
 
 - (IBAction)reportAsPassed:(id)sender {
