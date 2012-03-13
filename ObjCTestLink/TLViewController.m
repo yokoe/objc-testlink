@@ -8,6 +8,13 @@
 
 #import "TLViewController.h"
 
+
+NSString *const kTLEndpointURL = @"EndPointURL";
+NSString *const kTLDevKey = @"DevKey";
+NSString *const kTLTestCaseID = @"TestCaseID";
+NSString *const kTLTestPlanID = @"TestPlanID";
+NSString *const kTLBuildID = @"BuildID";
+
 @interface TLViewController ()
 
 @end
@@ -23,6 +30,15 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
+    
+    // Restore settings
+#define SetValueToTextField(field, key) (field.text = [[NSUserDefaults standardUserDefaults] objectForKey:key])
+    SetValueToTextField(txtBuildID, kTLBuildID);
+    SetValueToTextField(txtDevKey, kTLDevKey);
+    SetValueToTextField(txtEndPointURL, kTLEndpointURL);
+    SetValueToTextField(txtTestcaseID, kTLTestCaseID);
+    SetValueToTextField(txtTestplanID, kTLTestPlanID);
+#undef SetValueToTextField
 }
 
 - (void)viewDidUnload
@@ -45,11 +61,22 @@
     [textField resignFirstResponder];
     return YES;
 }
+- (void)sendReportAsStatus:(NSString*)status {
+    // Save settings
+#define SetValueToUserDefaults(field, key) ([[NSUserDefaults standardUserDefaults] setObject:field.text forKey:key])
+    SetValueToUserDefaults(txtBuildID, kTLBuildID);
+    SetValueToUserDefaults(txtDevKey, kTLDevKey);
+    SetValueToUserDefaults(txtEndPointURL, kTLEndpointURL);
+    SetValueToUserDefaults(txtTestcaseID, kTLTestCaseID);
+    SetValueToUserDefaults(txtTestplanID, kTLTestPlanID);
+    [[NSUserDefaults standardUserDefaults] synchronize];
+#undef SetValueToUserDefaults
+}
 - (IBAction)reportAsPassed:(id)sender {
-    NSLog(@"Passed");
+    [self sendReportAsStatus:@"p"];
 }
 - (IBAction)reportAsFailed:(id)sender {
-    NSLog(@"Failed");
+    [self sendReportAsStatus:@"f"];
 }
 - (void)dealloc {
     [txtEndPointURL release];
