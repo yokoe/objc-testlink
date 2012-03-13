@@ -8,6 +8,7 @@
 
 #import "TLViewController.h"
 
+#import "SYTestLink.h"
 
 NSString *const kTLEndpointURL = @"EndPointURL";
 NSString *const kTLDevKey = @"DevKey";
@@ -61,21 +62,6 @@ NSString *const kTLBuildID = @"BuildID";
     [textField resignFirstResponder];
     return YES;
 }
-- (NSString*)requestBodyWithDevKey:(NSString*)devKey testPlanID:(int)testPlanID testCaseID:(int)testCaseID buildID:(int)buildID status:(NSString*)status {
-    NSMutableArray* membersArray = [NSMutableArray array];
-#define AddStringMember(key, value) ([membersArray addObject:[NSString stringWithFormat:@"<member><name>%@</name><value><string>%@</string></value></member>", key, value]])
-#define AddStringMemberFromInt(key, value) AddStringMember(key, ([NSString stringWithFormat: @"%d", value]))
-    AddStringMember(@"devKey", devKey);
-    AddStringMemberFromInt(@"buildid", buildID);
-    AddStringMemberFromInt(@"testcaseid", testCaseID);
-    AddStringMemberFromInt(@"testplanid", testPlanID);
-    AddStringMember(@"status", status);
-#undef AddStringMember
-#undef AddStringMemberFromInt
-    
-    NSString* members = [membersArray componentsJoinedByString:@""];
-    return [NSString stringWithFormat:@"<methodCall><methodName>tl.reportTCResult</methodName><params><param><value><struct>%@</struct></value></param></params></methodCall>", members];
-}
 - (void)sendReportAsStatus:(NSString*)status {
     // Save settings
 #define SetValueToUserDefaults(field, key) ([[NSUserDefaults standardUserDefaults] setObject:field.text forKey:key])
@@ -88,24 +74,8 @@ NSString *const kTLBuildID = @"BuildID";
 #undef SetValueToUserDefaults
     
     // Generate request body
-    NSString* bodyString = [self requestBodyWithDevKey:txtDevKey.text testPlanID:[txtTestplanID.text intValue] testCaseID:[txtTestplanID.text intValue] buildID:[txtBuildID.text intValue] status:status];
-    
-    // Post
-    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:txtEndPointURL.text] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData 
-                                                       timeoutInterval:60.0]; 
-    [request setHTTPMethod:@"POST"];
-    [request setHTTPBody:[bodyString dataUsingEncoding:NSUTF8StringEncoding]];
-    [request setValue:@"text/xml" forHTTPHeaderField:@"Content-type"];
-    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
-        if (!error) {
-            NSLog(@"Response: %@", [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease]);
-        } else {
-            NSLog(@"Connection error: %@", error);
-            if (data) {
-                NSLog(@"Response: %@", [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease]);
-            }
-        }
-    }]; 
+    SYTestLink* tl = [[[SYTestLink alloc] initWithEndpointURL:txtEndPointURL.text devKey:txtDevKey.text testPlanID:[txtTestplanID.text intValue] buildID:[txtBuildID.text intValue]] autorelease];
+    [tl sendReportForTestCaseID:[txtTestcaseID.text intValue] status:status];
 }
 
 - (IBAction)reportAsPassed:(id)sender {
