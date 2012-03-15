@@ -75,7 +75,13 @@ NSString *const kTLBuildID = @"BuildID";
     
     // Generate request body
     SYTestLink* tl = [[[SYTestLink alloc] initWithEndpointURL:txtEndPointURL.text devKey:txtDevKey.text testPlanID:[txtTestplanID.text intValue] buildID:[txtBuildID.text intValue]] autorelease];
-    [tl sendReportForTestCaseID:[txtTestcaseID.text intValue] status:status];
+    int testCaseID = [txtTestcaseID.text intValue];
+    if ([status isEqualToString:@"p"]) {
+        [tl sendReportAsPassedForTestCaseID:testCaseID];
+    }
+    if ([status isEqualToString:@"f"]) {
+        [tl sendReportAsFailedForTestCaseID:testCaseID];
+    }
 }
 
 - (IBAction)reportAsPassed:(id)sender {

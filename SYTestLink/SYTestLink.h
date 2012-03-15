@@ -17,5 +17,8 @@
 + (void)sendReportToURL:(NSURL*)url withBody:(NSString*)body queue:(NSOperationQueue*)queue completionHandler:(void (^)(NSURLResponse* response, NSString* responseBody, NSError* error))completionHandler;
 
 - (id)initWithEndpointURL:(NSString*)endPointURL devKey:(NSString*)devKey testPlanID:(int)testPlanID buildID:(int)buildID;
-- (void)sendReportForTestCaseID:(int)testCaseID status:(NSString*)status;
+- (void)sendReportAsynchronouslyForTestCaseID:(int)testCaseID status:(NSString*)status;
+- (BOOL)sendReportForTestCaseID:(int)testCaseID status:(NSString*)status;
+- (BOOL)sendReportAsPassedForTestCaseID:(int)testCaseID;
+- (BOOL)sendReportAsFailedForTestCaseID:(int)testCaseID;
 @end
